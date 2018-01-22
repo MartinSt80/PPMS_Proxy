@@ -1,0 +1,15 @@
+# proxy address
+host_ip = XXXXXXXXXXXXXXXXXX
+# change together with SystemOptions.txt on each Microscope
+API_port = XXXXXXXXXXXXXXXXXXXX
+tracker_port = XXXXXXXXXXXXXXXXXXXXXXX
+
+# Change according to PPMS database
+tracker_URL = https://ppms.eu/XXXXXXXXXXXXXXXXXXXXXXXXXX/rt/
+PUMAPI_URL = https://ppms.eu/XXXXXXXXXXXXXXXXXXXXXXXXXXX/pumapi/
+API2_URL = https://ppms.eu/XXXXXXXXXXXXXXXXXXXXXXXXXXXXX/API2/
+PUMAPI_key = XXXXXXXXXXXXXXXXXXXXXXXXXX
+API2_key = XXXXXXXXXXXXXXXXXXXXXXXXX
+
+# File which stores the IP address AES_key_combinations
+AES_key_file = .aeskeys
