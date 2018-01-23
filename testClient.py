@@ -4,11 +4,11 @@
 import socket
 import pickle
 import struct
-import Options
 from Crypto.Cipher import AES
 from Crypto.Hash import SHA256
 from Crypto import Random
-import pickle
+
+from lib import Options
 
 
 def	sendToProxy(message):

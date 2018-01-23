@@ -5,12 +5,12 @@ import socket
 import pickle
 import struct
 import time
-from threading import *
+import requests
 
+from threading import *
 from Crypto.Cipher import AES
 from Crypto.Hash import SHA256
 from Crypto import Random
-import requests
 
 from lib import Options, Errors
 

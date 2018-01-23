@@ -8,7 +8,8 @@ from Crypto.Cipher import AES
 from Crypto.Hash import SHA256
 from Crypto import Random
 from threading import *
-import Options
+
+from lib import Options
 
 
 
