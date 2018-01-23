@@ -23,6 +23,7 @@ class ListeningSocket(Thread):
 		Thread.__init__(self)
 		self.ip = ip
 		self.port = int(port)
+
 		if port == PROXY_OPTIONS.getValue('API_port'):
 			self.type = 'API'			
 			self.AES_keys = Options.OptionReader(PROXY_OPTIONS.getValue('AES_key_file'))
@@ -173,8 +174,8 @@ class NewTrackerCall:
 		url = self.URL + '?i=' + self.data['id'] + '&f=' + self.data['freq'] + '&u=' + self.data['user']
 		requests.post(url, headers=self.header, data=self.data['code'])
 
-PROXY_OPTIONS = Options.OptionReader('ProxyOptions.txt')
 
+PROXY_OPTIONS = Options.OptionReader('ProxyOptions.txt')
 APIproxy = ListeningSocket(PROXY_OPTIONS.getValue('host_ip'), PROXY_OPTIONS.getValue('API_port'))
 trackerproxy = ListeningSocket(PROXY_OPTIONS.getValue('host_ip'), PROXY_OPTIONS.getValue('tracker_port'))
 
