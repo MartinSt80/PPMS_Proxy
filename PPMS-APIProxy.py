@@ -133,7 +133,12 @@ class CallAPI(Thread):
 			encryptor = AES.new(self.AES_key, AES.MODE_CFB, iv)
 			encrypted_data = iv + encryptor.encrypt(response_from_Paris)
 			data_from_Paris = struct.pack('>I', len(encrypted_data)) + encrypted_data
-			self.connection.sendall(data_from_Paris)
+
+			# if client disconnects during sending data, close connection
+			try:
+				self.connection.sendall(data_from_Paris)
+			except:
+				self.connection.close()
 
 
 class CallTracker(Thread):
