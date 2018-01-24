@@ -25,7 +25,8 @@ class ListeningSocket(Thread):
 		self.port = int(port)
 
 		if port == PROXY_OPTIONS.getValue('API_port'):
-			self.type = 'API'			
+			self.type = 'API'
+			# read client_ips, plainkeys from the key file, generate and store the AES-keys
 			self.AES_keys = Options.OptionReader(PROXY_OPTIONS.getValue('AES_key_file'))
 			for ip, plainkey in self.AES_keys.options.iteritems():
 				AES_key = SHA256.new()
@@ -111,18 +112,18 @@ class CallAPI(Thread):
 				parameters['apikey'] = PROXY_OPTIONS.getValue('API2_key')
 				URL = PROXY_OPTIONS.getValue('API2_URL')
 			else:
-				raise Errors.APIError('Unknown API interface type, must be PUMAPI or API2')
+				raise Errors.APIError(msg='Unknown API interface type, must be PUMAPI or API2')
 
 			response = requests.post(URL, headers=header, data=parameters)
 
 			# check if we got a proper response, HTTP status code == 200
 			try:
 				if not response.status_code == 200:
-					raise Errors.APIError('API didn\'t return a proper response')
+					raise Errors.APIError(True, False, msg='API didn\'t return a proper response')
 
 				# check if there is some data in the response, empty response, check parameters, options
 				if not response.text:
-					raise Errors.APIError('Empty response from API')
+					raise Errors.APIError(False, True, msg='Empty response from API')
 			except Errors.APIError as e:
 				response = e
 
@@ -142,13 +143,13 @@ class CallTracker(Thread):
 		self.connection = connection
 		self.start()
 
-	# get encrypted and pickled API parameter dict from client
+	# get pickled Tracker parameters dict from client
 	def run(self):
 
 		pickled_call = self.connection.recv(4096)
 		parameters = pickle.loads(pickled_call)
 
-		# create a new tracker call object, add the transmitted parameters and send the API response back to sender
+		# create a new tracker call object, add the transmitted parameters
 		newCall = NewTrackerCall()
 		newCall.config(parameters)
 		newCall.callParis()
@@ -176,8 +177,8 @@ class NewTrackerCall:
 
 
 PROXY_OPTIONS = Options.OptionReader('ProxyOptions.txt')
-APIproxy = ListeningSocket(PROXY_OPTIONS.getValue('host_ip'), PROXY_OPTIONS.getValue('API_port'))
-trackerproxy = ListeningSocket(PROXY_OPTIONS.getValue('host_ip'), PROXY_OPTIONS.getValue('tracker_port'))
+API_proxy = ListeningSocket(PROXY_OPTIONS.getValue('host_ip'), PROXY_OPTIONS.getValue('API_port'))
+tracker_proxy = ListeningSocket(PROXY_OPTIONS.getValue('host_ip'), PROXY_OPTIONS.getValue('tracker_port'))
 
 
 
