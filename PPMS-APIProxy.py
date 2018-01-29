@@ -12,7 +12,7 @@ from Crypto.Cipher import AES
 from Crypto.Hash import SHA256
 from Crypto import Random
 
-from lib import Options, Errors
+from lib import Options, PPMSAPICalls
 
 
 
@@ -101,31 +101,34 @@ class CallAPI(Thread):
 			time.sleep(1)
 			self.connection.close()
 		else:
-			# create a new API call object, add the transmitted parameters and send the API response back to sender
-			header = {'Content-Type': 'application/x-www-form-urlencoded'}
-			API_type = parameters.pop('API_type')
+			# # create a new API call object, add the transmitted parameters and send the API response back to sender
+			# header = {'Content-Type': 'application/x-www-form-urlencoded'}
+			# API_type = parameters.pop('API_type')
+			#
+			# if API_type == 'PUMAPI':
+			# 	parameters['apikey'] = PROXY_OPTIONS.getValue('PUMAPI_key')
+			# 	URL = PROXY_OPTIONS.getValue('PUMAPI_URL')
+			# elif API_type == 'API2':
+			# 	parameters['apikey'] = PROXY_OPTIONS.getValue('API2_key')
+			# 	URL = PROXY_OPTIONS.getValue('API2_URL')
+			# else:
+			# 	raise Errors.APIError(msg='Unknown API interface type, must be PUMAPI or API2')
+			#
+			# response = requests.post(URL, headers=header, data=parameters)
+			#
+			# # check if we got a proper response, HTTP status code == 200
+			# try:
+			# 	if not response.status_code == 200:
+			# 		raise Errors.APIError(True, False, msg='API didn\'t return a proper response')
+			#
+			# 	# check if there is some data in the response, empty response, check parameters, options
+			# 	if not response.text:
+			# 		raise Errors.APIError(False, True, msg='Empty response from API')
+			# except Errors.APIError as e:
+			# 	response = e
 
-			if API_type == 'PUMAPI':
-				parameters['apikey'] = PROXY_OPTIONS.getValue('PUMAPI_key')
-				URL = PROXY_OPTIONS.getValue('PUMAPI_URL')
-			elif API_type == 'API2':
-				parameters['apikey'] = PROXY_OPTIONS.getValue('API2_key')
-				URL = PROXY_OPTIONS.getValue('API2_URL')
-			else:
-				raise Errors.APIError(msg='Unknown API interface type, must be PUMAPI or API2')
-
-			response = requests.post(URL, headers=header, data=parameters)
-
-			# check if we got a proper response, HTTP status code == 200
-			try:
-				if not response.status_code == 200:
-					raise Errors.APIError(True, False, msg='API didn\'t return a proper response')
-
-				# check if there is some data in the response, empty response, check parameters, options
-				if not response.text:
-					raise Errors.APIError(False, True, msg='Empty response from API')
-			except Errors.APIError as e:
-				response = e
+			call_to_Paris = PPMSAPICalls.NewCall('PPMS API')
+			response = call_to_Paris._performCall(parameters)
 
 			response_from_Paris = pickle.dumps(response)
 
