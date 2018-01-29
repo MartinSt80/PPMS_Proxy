@@ -12,7 +12,7 @@ from Crypto.Cipher import AES
 from Crypto.Hash import SHA256
 from Crypto import Random
 
-from lib import Options, PPMSAPICalls
+from lib import Options, PPMSAPICalls, Errors
 
 
 
@@ -128,7 +128,11 @@ class CallAPI(Thread):
 			# 	response = e
 
 			call_to_Paris = PPMSAPICalls.NewCall('PPMS API')
-			response = call_to_Paris._performCall(parameters)
+
+			try:
+				response = call_to_Paris._performCall(parameters)
+			except Errors.APIError as e:
+				response = e
 
 			response_from_Paris = pickle.dumps(response)
 
@@ -150,6 +154,7 @@ class CallTracker(Thread):
 		Thread.__init__(self)
 		self.connection = connection
 		self.start()
+
 
 	# get pickled Tracker parameters dict from client
 	def run(self):
