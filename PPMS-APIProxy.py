@@ -14,6 +14,7 @@ from Crypto import Random
 
 from lib import Options, PPMSAPICalls, Errors
 
+from scapy.all import *
 
 
 # starts a proxy listening for PUMAPI calls
@@ -47,11 +48,20 @@ class ListeningSocket(Thread):
 			client_connection, client_address = self.sock.accept()
 
 			if self.type == 'API':
-				# retrieve AES-key for the ip-address, close connection if ip-address is not in file
+				# retrieve AES-key for the MAC-address, close connection if MAC-address is not in file
+				# or no MAC-address resolved
 				try:
-					AES_key = self.AES_keys.getValue(client_address[0])
+					# arping: resolve MAC-address for client ip
+					answered_list, unanswered_list = srp(Ether(dst="ff:ff:ff:ff:ff:ff") / ARP(pdst=client_address[0]),
+														timeout=2,
+														retry=10,
+														verbose=False)
+					receiver = answered_list[0][1]
+					receiver_mac = receiver[Ether].hwsrc
+
+					AES_key = self.AES_keys.getValue(receiver_mac)
 					CallAPI(client_connection, AES_key)
-				except KeyError:
+				except Exception:
 					time.sleep(1)
 					client_connection.close()
 
@@ -101,32 +111,6 @@ class CallAPI(Thread):
 			time.sleep(1)
 			self.connection.close()
 		else:
-			# # create a new API call object, add the transmitted parameters and send the API response back to sender
-			# header = {'Content-Type': 'application/x-www-form-urlencoded'}
-			# API_type = parameters.pop('API_type')
-			#
-			# if API_type == 'PUMAPI':
-			# 	parameters['apikey'] = PROXY_OPTIONS.getValue('PUMAPI_key')
-			# 	URL = PROXY_OPTIONS.getValue('PUMAPI_URL')
-			# elif API_type == 'API2':
-			# 	parameters['apikey'] = PROXY_OPTIONS.getValue('API2_key')
-			# 	URL = PROXY_OPTIONS.getValue('API2_URL')
-			# else:
-			# 	raise Errors.APIError(msg='Unknown API interface type, must be PUMAPI or API2')
-			#
-			# response = requests.post(URL, headers=header, data=parameters)
-			#
-			# # check if we got a proper response, HTTP status code == 200
-			# try:
-			# 	if not response.status_code == 200:
-			# 		raise Errors.APIError(True, False, msg='API didn\'t return a proper response')
-			#
-			# 	# check if there is some data in the response, empty response, check parameters, options
-			# 	if not response.text:
-			# 		raise Errors.APIError(False, True, msg='Empty response from API')
-			# except Errors.APIError as e:
-			# 	response = e
-
 			call_to_Paris = PPMSAPICalls.NewCall('PPMS API')
 
 			try:
