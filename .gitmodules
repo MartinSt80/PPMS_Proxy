@@ -1,0 +1,3 @@
+[submodule "ppms_lib"]
+	path = ppms_lib
+	url = https://github.com/MartinSt80/lib
